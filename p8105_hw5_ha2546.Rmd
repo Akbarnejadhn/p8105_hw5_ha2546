@@ -28,5 +28,16 @@ First, I chose a sample of 20 from these 150 obserations, and eplaced them with 
 ```{r fill_NA}
 
 
+replace_NA_fnc = function(vector){
+  
+  if(is.character(vector)){
+    replace_na("virginica")
+  } else if (is.numeric(vector)) {
+    replace_na(mean(vector))
+  }
+  
+}
+
+a = replace_NA_fnc(iris_with_missing$Species)
 ```
 

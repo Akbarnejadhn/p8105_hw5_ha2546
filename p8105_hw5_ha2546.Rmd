@@ -1,0 +1,32 @@
+---
+title: "p8105_hw5_ha2546"
+author: "Hana Akbarnejad"
+date: "11/3/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+```{r import,replace_NA}
+
+head(iris, 5)
+
+set.seed(10)
+
+iris_with_missing = iris %>% 
+  map_df(~replace(.x, sample(1:150, 20), NA)) %>%
+  mutate(Species = as.character(Species))
+```
+
+_iris_ is a dataset that contains `r nrow(iris)` observations of `r n_distinct(pull(iris, Species))` different flower species: `r unique(pull(iris, Species))`. It stores information in `r ncol(iris)` variables about flowers: species, sepal length and width, and petal length and width.
+First, I chose a sample of 20 from these 150 obserations, and eplaced them with NA. I also converted the species factor variable to numeric. 
+
+```{r fill_NA}
+
+
+```
+

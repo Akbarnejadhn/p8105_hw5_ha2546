@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
 
 library(tidyverse)
 ```
@@ -93,4 +94,4 @@ long_data_tidy = long_data %>%
   theme_classic()
 ```
 
-As it can be observed 
+As it can be observed in the spaghetti plot, in the cotrol group, the observed value of each individual goes up and down but the trend is not overallt increasing or decreasing. However, in the experimental group the overall change in subjects show a general upgrowing trend. Additionally, the total average of experimental group has been higher than control group through weeks and this difference gets greater as we proceed through weeks.

@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
+## Problem 1
 ```{r import,replace_NA}
 
 head(iris, 5)
@@ -30,7 +31,9 @@ First, I chose a sample of 20 from these 150 obserations, and eplaced them with 
 
 replace_NA_fnc = function(vect){
   
-  if(is.character(vect)){
+  if(!is.character(vect) & !is.numeric(vect)){
+    stop("This function only works on numeric and character vectors")
+  } else if(is.character(vect)){
     replace_na(vect, "virginica")
   } else if (is.numeric(vect)) {
     replace_na(vect, mean(vect, na.rm = TRUE))
@@ -40,5 +43,11 @@ replace_NA_fnc = function(vect){
 
 
 iris_output = map(iris_with_missing, replace_NA_fnc) %>%  as_tibble() 
+```
+
+## Problem 2
+```{r}
+
+
 ```
 

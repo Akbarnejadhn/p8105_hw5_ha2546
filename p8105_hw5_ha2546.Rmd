@@ -46,8 +46,15 @@ iris_output = map(iris_with_missing, replace_NA_fnc) %>%  as_tibble()
 ```
 
 ## Problem 2
+This problem focuses on control and experimental files for 10 subjects, each contain longitudinal data over a 8-week period.
+
+First, we want to import these files' information in a data frame.
 ```{r}
 
-
+long_data = list.files(path = "./data") %>% 
+  bind_rows() %>% 
+  mutate(
+    value = map(, read_csv("./data"))
+  )
 ```
 

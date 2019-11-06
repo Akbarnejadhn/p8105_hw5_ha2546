@@ -51,10 +51,12 @@ This problem focuses on control and experimental files for 10 subjects, each con
 First, we want to import these files' information in a data frame.
 ```{r}
 
-long_data = list.files(path = "./data") %>% 
-  bind_rows() %>% 
+long_data = tibble(
+    file_names = list.files(path = "./data")
+    ) %>% 
   mutate(
-    value = map(, read_csv("./data"))
-  )
+    value = map(.x = file_names, ~read_csv(str_c("./data/", .x)))
+  ) %>% 
+  unnest()
 ```
 

@@ -62,6 +62,27 @@ long_data = tibble (
 
 ```{r tidy_data}
 
+long_data_tidy = long_data %>% 
+  separate(file_names, c("arm", "case_ID")) %>% 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    values_to = "value",
+    names_prefix = "week_"
+  ) %>% 
+  rename(group = arm) %>%
+  mutate(
+    group = factor(group, levels = c("con", "exp"), labels = c("control", "experimental")),
+    week = factor(week, ordered = TRUE),
+    case_ID = factor(case_ID)
+  )
 ```
 
+```{r spaghetti_plot}
+
+  ggplot(data = long_data_tidy, aes(x = week, y = value, color = group)) +
+  geom_point(data = subset(long_data_tidy, group %in% c("control","experimental"))) +
+  geom_line(data=subset(long_data_tidy, group == "control"), aes(group=case_ID, color = group)) +
+  geom_line(data=subset(long_data_tidy, group == "experimental"), aes(group=case_ID, color = group))
+```
 

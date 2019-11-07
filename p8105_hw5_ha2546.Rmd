@@ -95,3 +95,28 @@ long_data_tidy = long_data %>%
 ```
 
 As it can be observed in the spaghetti plot, in the cotrol group, the observed value of each individual goes up and down but the trend is not overallt increasing or decreasing. However, in the experimental group the overall change in subjects show a general upgrowing trend. Additionally, the total average of experimental group has been higher than control group through weeks and this difference gets greater as we proceed through weeks.
+
+## Problem 3
+```{r}
+
+sim_regression = function (n = 30, beta0 = 2, beta1) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 0, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, mean = 0, sd = sqrt(50))
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data) %>% 
+    broom::tidy()
+  
+  tibble(
+    beta1_hat = ls_fit[[2,2]],
+    p_value = ls_fit[[2,5]]
+  )
+  
+}
+
+slope0_sim = sim_regression(n = 30, beta0 = 2, beta1 = 0)
+slope0_sim
+```
+

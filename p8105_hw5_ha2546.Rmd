@@ -11,6 +11,7 @@ library(tidyverse)
 
 knitr::opts_chunk$set(
 	echo = TRUE,
+	message = FALSE,
 	warning = FALSE,
 	fig.width = 8, 
   fig.height = 6,
@@ -57,6 +58,7 @@ replace_NA_fnc = function(vect){
 
 
 iris_output = map(iris_with_missing, replace_NA_fnc) %>%  as_tibble() 
+head(iris_output, 5)
 ```
 
 ## Problem 2
@@ -74,6 +76,7 @@ long_data = tibble (
   unnest()
 ```
 
+Data tidying process:
 ```{r tidy_data}
 
 long_data_tidy = long_data %>% 
@@ -91,10 +94,12 @@ long_data_tidy = long_data %>%
     case_ID = factor(case_ID)
   )
 ```
+To clean the data, I seperated case column to two columns (one for arm and one for subject ID). I also made the data frame longer, creating a new variable for week number, and cleaned the names. Then I created factor variables.
 
+In the next step, I created a plot that shows how the trends of weekly values differ in control and experimental groups (demonstrating all 10 individual cases). I used a spaghetti plot to show the differences:
 ```{r spaghetti_plot}
 
-  ggplot(data = long_data_tidy, aes(x = week, y = value, color = group)) +
+spaghetti_plot = ggplot(data = long_data_tidy, aes(x = week, y = value, color = group)) +
   geom_point(data = subset(long_data_tidy, group %in% c("control","experimental"))) +
   geom_line(data=subset(long_data_tidy, group == "control"), aes(group=case_ID, color = group)) +
   geom_line(data=subset(long_data_tidy, group == "experimental"), aes(group=case_ID, color = group)) +
@@ -105,11 +110,15 @@ long_data_tidy = long_data %>%
     title = "Observed Values over Weeks in Control vs. Experimental Groups"
   ) +
   theme_classic()
+
+spaghetti_plot
 ```
 
-As it can be observed in the spaghetti plot, in the cotrol group, the observed value of each individual goes up and down but the trend is not overallt increasing or decreasing. However, in the experimental group the overall change in subjects show a general upgrowing trend. Additionally, the total average of experimental group has been higher than control group through weeks and this difference gets greater as we proceed through weeks.
+
+As it can be observed in this plot, in the cotrol group, the observed value of each individual goes up and down but the overall trend stays ina range and is not increasing or decreasing (no linear trend). However, in the experimental group the overall change in subjects show a general upgrowing trend. Additionally, the total average of experimental group has been higher than control group through weeks and this difference gets greater as we proceed through weeks.
 
 ## Problem 3
+In this problem, I wrote a simple linear regression model function that accounts for different fixed and non-fixed parameters. I extracted and saved beta1_hat and p_value values, ran the simulation 10,000 times for different true beta_1 values, and saved the results
 ```{r}
 
 sim_regression = function (n = 30, beta0 = 2, beta1) {
@@ -138,9 +147,10 @@ sim_results =
   unnest()
 ```
 
+Then, I made a bar plot showing the relationship between the effect size (beta1 true values) and the power of the test.
 ```{r}
 
-sim_results %>% 
+power_effect_plot = sim_results %>% 
   group_by(beta1_values) %>% 
   summarize(
     reject_null = sum(p_value < 0.05),
@@ -153,14 +163,18 @@ sim_results %>%
   ggplot(aes(x = beta1_values, y = proportion, color = beta1_values, fill = beta1_values)) +
   geom_bar(stat="identity") +
   labs(
-    x= "Beta_1 Values",
-    y = "Rejected Null Proportion (p_val < 0.05)",
+    x= "Beta_1 True Values",
+    y = "Power(Proportion of Rejected Null)",
     title = NULL,
     caption = NULL
   ) 
-  
+
+power_effect_plot 
 ```
-Describe the association between effect size and power.
+
+It can be be observed that by increasing the effect size (the true value of beta_1), the power of the test increases. This observation aligns with what we expect since when going away from the null hypothesis (beta_1 = 0), it is more probable that we get a lower p_value and reject the null correctly when the null hypothesis is false.
+
+On the next step, I want to see the relationship between average estimate of beta_1 and the true value of beta_1. I would like to observe how this relationship changes when considering the whole sample, and when considering only the ones in which the null hypothesis has been rejected.
 
 ```{r}
 
@@ -183,13 +197,14 @@ comparison_plot = ggplot() +                      # using above dataframes to ov
   geom_point(data = df2, aes(x = beta1_values, y = beta1_hat_mean)) +
   geom_line(data = df2, aes(x = beta1_values, y = beta1_hat_mean), color = "#482677FF") +
   labs(
-    title = "    beta_1 estimates in different beta_1 values
-    in all sample (yellow line) vs. samples with rejected null (purple line)",
-    x = "beta_1 Values",
+    title = "    Average beta_1 estimates vs. beta_1 true values
+    in all samples (yellow line) and samples with rejected null (purple line)",
+    x = "beta_1 true Values",
     y = "Mean beta_1 Estimate",
     caption = NULL
   )
-  
 
+comparison_plot
 ```
 
+We previousely noted that by increasing the effect size, the power increases. This means that a higher proportion of sample get rejected when they have to be rejected which results in decrease in the proportion of those cases in the overall sample in which the null **has not been rejected**. This is the reason that in this plot, we observe the difference between two lines decreases as the effect size increases; because there are fewer unrejected cases left. The same reason justifys why we observe the highest diffetence in beta_1 = 1 case, since the effect size is small and halph of the cases which should be rejected stay unrejected. This trend is observed because instead of taking random samples, we are choosing the ones with p_value < 0.05, so the result we get is not unbiased anymore.

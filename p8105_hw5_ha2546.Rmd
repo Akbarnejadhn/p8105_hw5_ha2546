@@ -141,10 +141,11 @@ sim_regression = function (n = 30, beta0 = 2, beta1) {
 sim_results = 
   tibble(beta1_values = c(0, 1, 2, 3, 4, 5, 6)) %>% 
   mutate(
-    output_lists = map(beta1_values, ~rerun(10000, sim_regression(beta1 = .x)))
-    ) %>% 
-  unnest() %>% 
-  unnest()
+    output_lists = map(beta1_values, ~rerun(10000, sim_regression(beta1 = .x))),
+    estimate_dfs = map(output_lists, bind_rows)
+  ) %>% 
+  select(-output_lists) %>% 
+  unnest(estimate_dfs)
 ```
 
 Then, I made a bar plot showing the relationship between the effect size (beta1 true values) and the power of the test.
